@@ -120,9 +120,10 @@ def documents(reader, es):
     print('Exception count:', count)
 
 if __name__ == "__main__":
+    GEONAMES_PATH = 'cities500.txt'
+    #GEONAMES_PATH = 'allCountries.txt'
     t = time.time()
-    f = open('allCountries.txt', 'rt')
-    #f = open('shortcountries.txt', 'rt')
+    f = open(GEONAMES_PATH, 'rt', encoding='utf-8')
     reader = csv.reader(f, delimiter='\t')
     actions = documents(reader, es)
     helpers.bulk(es, actions, chunk_size=500)
