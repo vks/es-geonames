@@ -83,10 +83,10 @@ def iso_convert(iso2c):
         iso3c = "NA"
         return iso3c
 
-def documents(reader, es):
+def documents(reader, es, nrows):
     todays_date = datetime.today().strftime("%Y-%m-%d")
     count = 0
-    for row in tqdm(reader, total=11741135): # approx
+    for row in tqdm(reader, total=nrows):
         try:
             coords = row[4] + "," + row[5]
             country_code3 = iso_convert(row[8])
@@ -122,11 +122,19 @@ def documents(reader, es):
 if __name__ == "__main__":
     GEONAMES_PATH = 'cities500.txt'
     #GEONAMES_PATH = 'allCountries.txt'
+
+    nrows = 0
+    f = open(GEONAMES_PATH, 'rt', encoding='utf-8')
+    for row in f:
+        nrows += 1
+    f.close()
+
     t = time.time()
     f = open(GEONAMES_PATH, 'rt', encoding='utf-8')
     reader = csv.reader(f, delimiter='\t')
-    actions = documents(reader, es)
+    actions = documents(reader, es, nrows)
     helpers.bulk(es, actions, chunk_size=500)
     es.indices.refresh(index='geonames')
     e = (time.time() - t) / 60
     print("Elapsed minutes: ", e)
+    f.close()
